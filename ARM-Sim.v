@@ -1,5 +1,6 @@
-module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out, instuction_out);
+module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 	wire[31:0] if_pc_out, if_instruction_out;
+	wire[31:0] ifreg_instruction_out;
 	wire[31:0] ifreg_pc_out;
 	// ID Stage outs
 	wire id_wb_en_out, id_mem_r_en_out, id_mem_w_en_out, id_b_out, id_s_out;
@@ -44,10 +45,26 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out, instuction_out);
 
 	wire[31:0] status_reg_out;
 
+	wire hazard_detected;
+	wire [3:0] src2;
+	assign src2 = (ifreg_instruction_out[25] == 1'b0 && ifreg_instruction_out[4] == 0) ? ifreg_instruction_out[3:0] : 4'b0;
+
+	HazardDetectionUnit hdu(
+		.src1(ifreg_instruction_out[19:16]),
+		.src2(src2),
+		.Exe_Dest(idreg_dest_out),
+		.Mem_Dest(execreg_dest_out),
+		.Exe_WB_EN(idreg_wb_en_out),
+		.Mem_WB_EN(execreg_mem_w_en_out),
+		.is_imm(ifreg_instruction_out[25]),
+		.is_str(id_mem_w_en_out),
+ 		.hazard_detected(hazard_detected)
+	);
+
 	IF_Stage ifStage (
 		.clk(CLOCK_50),
 		.rst(rst),
-		.freeze(1'b0),
+		.freeze(hazard_detected),
 		.branch_taken(idreg_b_out),
 		.branch_addr(exec_br_addr_out),
 		.pc(if_pc_out),
@@ -57,12 +74,12 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out, instuction_out);
 	IF_Stage_Reg ifStageReg (
 		.clk(CLOCK_50),
 		.rst(rst),
-		.freeze(1'b0),
+		.freeze(hazard_detected),
 		.flush(idreg_b_out),
 		.pc_in(if_pc_out),
 		.instuction_in(if_instruction_out),
 		.pc(ifreg_pc_out),
-		.instruction(instuction_out)
+		.instruction(ifreg_instruction_out)
 	);
 
 	ID_Stage idStage (
@@ -70,13 +87,14 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out, instuction_out);
 		.clk(CLOCK_50), 
 		.rst(rst),
 		// from if
-		.instruction(instuction_out),
+		.instruction(ifreg_instruction_out),
 		// from wb
 		.result_wb(wb_out),
 		.write_back_in(memreg_wb_en_out),
 		.dest_wb(memreg_dest_out),
 		// from status reg
-		.sr(status_reg_out),
+		.sr(status_reg_out[31:28]),
+		.hazard(hazard_detected),
 		// outputs
 		.wb_en(id_wb_en_out),
 		.mem_r_en(id_mem_r_en_out),

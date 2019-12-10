@@ -1,12 +1,11 @@
 module aaa_tb ();
  
   reg clk, rst;
-  wire[31:0] pc_out, instruction_out;
+  wire[31:0] pc_out;
  
   ARMSIM armsim (
 		.CLOCK_50(clk),
 		.rst(rst),
-		.instuction_out(instruction_out),
 		.pc_out(pc_out)
 	);
  

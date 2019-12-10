@@ -5,6 +5,7 @@ module ID_Stage(
 	input write_back_in,
 	input[3:0] dest_wb,
 	input[3:0] sr,
+	input hazard,
 	
 	output wb_en, mem_r_en, mem_w_en, b, s,
 	output[3:0] exe_cmd,
@@ -16,14 +17,9 @@ module ID_Stage(
 	// output[3:0] src1, scr2,
 	// output two_src
 );
-
 	wire [3:0] src2;
-	MUX regFileSrc1Mux (
-		.in_1(instruction[15:12]),
-		.in_2(instruction[3:0]),
-		.select(mem_w_en),
-		.out(src2)
-	);
+	// regFileSrc1Mux
+	assign src2 = (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
 
 	RegisterFile registerFile (
 	  .clk(clk),
@@ -59,7 +55,7 @@ module ID_Stage(
 	    .WB_Enable(w_wb_en)
   	);
   	
-  	assign {s, b, mem_w_en, mem_r_en, wb_en, exe_cmd} = ~w_condOut ? {w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en, w_exe_cmd} : 13'd0;
+  	assign {s, b, mem_w_en, mem_r_en, wb_en, exe_cmd} = (w_condOut || hazard) ? {w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en, w_exe_cmd} : 13'd0;
   	assign {imm, signed_imm_24, shift_operand, dest} = {instruction[25], instruction[23:0], instruction[11:0], instruction[15:12]};
 
 endmodule

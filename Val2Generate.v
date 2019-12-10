@@ -2,15 +2,24 @@ module Val2Generate (
 	input[31:0] val_rm,
 	input[11:0] shift_operand,
 	input los, imm,
-	output[31:0] val2
+	output reg[31:0] val2
 );
+	reg [7:0] shiftby;
+	reg [31:0] imm_value;
+	reg [31:0] temp;
 
-	assign val2 = (los == 1'd1) ? {20'b0, shift_operand} 
-				: (imm == 1'd1) ? {24'b0, shift_operand[7:0]} >> (shift_operand[11:8] << 1) 
-				: (shift_operand[6:5] == 2'b00) ? val_rm << 1'b0 
-				: (shift_operand[6:5] == 2'b01) ? val_rm >> 1'b0 
-				: (shift_operand[6:5] == 2'b10) ? val_rm >>> 1'b0 
-				: (shift_operand[6:5] == 2'b11) ? {val_rm[0], val_rm[30:0]}
-				: 32'd0;
+	always @* begin
+		if (los) val2 = {20'b0, shift_operand};
+		else if (imm) begin
+			shiftby = {4'b0000, shift_operand[11:8]} << 1;
+			imm_value = {24'b0, shift_operand[7:0]};
+			{temp,val2} = {imm_value,imm_value} >> shiftby;
+		end
+		else if (shift_operand[6:5] == 2'b00) val2 = val_rm << 1'b0 ;
+		else if (shift_operand[6:5] == 2'b01) val2 = val_rm >> 1'b0 ;
+		else if (shift_operand[6:5] == 2'b10) val2 = val_rm >>> 1'b0 ;
+		else if (shift_operand[6:5] == 2'b11) val2 = {val_rm[0], val_rm[30:0]};
+		else val2 = 32'd0;
+	end
 
 endmodule

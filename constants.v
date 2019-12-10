@@ -1,12 +1,3 @@
-// Wire widths
-`define EXE_CMD_LEN 4
-`define FORW_SEL_LEN 2
-`define OP_CODE_LEN 6
-
-// Memory constants
-`define DATA_MEM_SIZE 1024
-`define INSTR_MEM_SIZE 1024
-`define MEM_CELL_SIZE 8
 
 // To be used inside controller.v
 `define OP_NOP 4'b0000
@@ -41,9 +32,3 @@
 `define EXE_TST 4'b1000
 `define EXE_LDR 4'b0100
 `define EXE_STR 4'b0100
-
-// To be used in conditionChecker
-`define COND_JUMP 2'b10
-`define COND_BEZ 2'b11
-`define COND_BNE 2'b01
-`define COND_NOTHING 2'b00
