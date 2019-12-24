@@ -55,7 +55,7 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.Exe_Dest(idreg_dest_out),
 		.Mem_Dest(execreg_dest_out),
 		.Exe_WB_EN(idreg_wb_en_out),
-		.Mem_WB_EN(execreg_mem_w_en_out),
+		.Mem_WB_EN(execreg_wb_en_out),
 		.is_imm(ifreg_instruction_out[25]),
 		.is_str(id_mem_w_en_out),
  		.hazard_detected(hazard_detected)
@@ -147,7 +147,7 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.sr(idreg_sr_out)
 	);
 
-	Register statusReg (
+	NegRegister statusReg (
 		.clk(CLOCK_50),
 		.rst(rst),
 		.write_en(idreg_s_out),
@@ -182,7 +182,7 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.mem_r_en_in(idreg_mem_r_en_out),
 		.mem_w_en_in(idreg_mem_w_en_out),
 		.alu_result_in(exec_alu_result_out),
-		.st_val_in({exec_status_out, 28'b0}),
+		.st_val_in(idreg_val_rm_out),
 		.dest_in(idreg_dest_out),
 		// outs
 		.wb_en(execreg_wb_en_out),

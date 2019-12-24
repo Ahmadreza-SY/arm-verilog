@@ -15,9 +15,9 @@ module Val2Generate (
 			imm_value = {24'b0, shift_operand[7:0]};
 			{temp,val2} = {imm_value,imm_value} >> shiftby;
 		end
-		else if (shift_operand[6:5] == 2'b00) val2 = val_rm << 1'b0 ;
-		else if (shift_operand[6:5] == 2'b01) val2 = val_rm >> 1'b0 ;
-		else if (shift_operand[6:5] == 2'b10) val2 = val_rm >>> 1'b0 ;
+		else if (shift_operand[6:5] == 2'b00) val2 = val_rm << shift_operand[11:7] ;
+		else if (shift_operand[6:5] == 2'b01) val2 = val_rm >> shift_operand[11:7] ;
+		else if (shift_operand[6:5] == 2'b10) val2 = val_rm >>> shift_operand[11:7] ;
 		else if (shift_operand[6:5] == 2'b11) val2 = {val_rm[0], val_rm[30:0]};
 		else val2 = 32'd0;
 	end

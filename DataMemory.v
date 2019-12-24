@@ -5,14 +5,16 @@ module DataMemory (
   );
   integer i;
   reg [31:0] dataMem [0:63];
+  reg [31:0] converted_address;
 
   always @ (posedge clk) begin
+    converted_address = (address - 1024) >> 2;
     if (rst)
       for (i = 0; i < 64; i = i + 1)
         dataMem[i] <= 0;
     else if (mem_w_en)
-      dataMem[address] <= dataIn;
+      dataMem[converted_address] <= dataIn;
   end
 
-  assign dataOut = (mem_r_en == 1) ? dataMem[address] : 0;
+  assign dataOut = (mem_r_en == 1) ? dataMem[converted_address] : 0;
 endmodule

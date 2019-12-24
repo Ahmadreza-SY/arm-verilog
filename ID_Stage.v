@@ -30,8 +30,8 @@ module ID_Stage(
 	  .Dest_wb(dest_wb),
 	  .Result_WB(result_wb),
 	  // outputs
-	  .reg1(val_rm),
-	  .reg2(val_rn)
+	  .reg1(val_rn),
+	  .reg2(val_rm)
   	);
 
 	wire w_condOut;
@@ -55,7 +55,7 @@ module ID_Stage(
 	    .WB_Enable(w_wb_en)
   	);
   	
-  	assign {s, b, mem_w_en, mem_r_en, wb_en, exe_cmd} = (w_condOut || hazard) ? {w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en, w_exe_cmd} : 13'd0;
+  	assign {s, b, mem_w_en, mem_r_en, wb_en, exe_cmd} = (~w_condOut || hazard) ? 13'd0 : {w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en, w_exe_cmd};
   	assign {imm, signed_imm_24, shift_operand, dest} = {instruction[25], instruction[23:0], instruction[11:0], instruction[15:12]};
 
 endmodule

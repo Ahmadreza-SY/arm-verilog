@@ -10,7 +10,7 @@ module aaa_tb ();
 	);
  
   initial begin
-    clk = 1'b0;
+    clk = 1'b1;
     rst = 1'b1;
     repeat(4) #10 clk = ~clk;
     rst = 1'b0;
