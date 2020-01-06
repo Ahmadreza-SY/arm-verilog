@@ -5,12 +5,12 @@ module RegisterFile (
   output [31:0] reg1, reg2
   );
 
-  reg [31:0] registerMemory [0:14];
+  reg [31:0] registerMemory [0:15];
   integer i;
 
   always @ (negedge clk) begin
     if (rst) begin
-      for (i = 0; i < 15; i = i + 1)
+      for (i = 0; i < 16; i = i + 1)
         registerMemory[i] <= i[31:0];
 	    end
 

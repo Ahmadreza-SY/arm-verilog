@@ -1,4 +1,4 @@
-module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
+module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
 	wire[31:0] if_pc_out, if_instruction_out;
 	wire[31:0] ifreg_instruction_out;
 	wire[31:0] ifreg_pc_out;
@@ -22,6 +22,7 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 	wire[3:0] idreg_dest_out;
   	wire[31:0] idreg_pc_out;
   	wire[3:0] idreg_sr_out;
+  	wire[3:0] idreg_src1_out, idreg_src2_out;
 
   	// EXEC Stage outs
   	wire[31:0] exec_alu_result_out, exec_br_addr_out;
@@ -45,6 +46,10 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 
 	wire[31:0] status_reg_out;
 
+	// forwarding
+	wire[1:0] fu_src1_sel_out, fu_src2_sel_out;
+
+	// hazard
 	wire hazard_detected;
 	wire [3:0] src2;
 	assign src2 = (ifreg_instruction_out[25] == 1'b0 && ifreg_instruction_out[4] == 0) ? ifreg_instruction_out[3:0] : 4'b0;
@@ -57,8 +62,25 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.Exe_WB_EN(idreg_wb_en_out),
 		.Mem_WB_EN(execreg_wb_en_out),
 		.is_imm(ifreg_instruction_out[25]),
+
+		.MEM_R_EN_EXE(idreg_mem_r_en_out),
+		.fu_EN(fu_EN), 
+		.instr_is_branch(idreg_b_out),
+
 		.is_str(id_mem_w_en_out),
  		.hazard_detected(hazard_detected)
+	);
+
+	ForwardingUnit fu (
+		.EX_Rn_in(idreg_src1_out),
+		.EX_Rm_in(idreg_src2_out),
+		.MEM_Rd_in(execreg_dest_out),
+		.WB_Rd_in(memreg_dest_out),
+		.WB_EN_MEM(execreg_wb_en_out),
+		.WB_EN_WB(memreg_wb_en_out),
+		.fu_EN(fu_EN),
+		.src1_sel(fu_src1_sel_out),
+		.src2_sel(fu_src2_sel_out)
 	);
 
 	IF_Stage ifStage (
@@ -129,6 +151,9 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.signed_imm_24_in(id_signed_imm_24_out),
 		.dest_in(id_dest_out),
 		.sr_in(status_reg_out[31:28]),
+
+		.src1_in(ifreg_instruction_out[19:16]),
+		.src2_in(src2),
 		
 		// outputs
 		.wb_en(idreg_wb_en_out), 
@@ -144,7 +169,10 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.signed_imm_24(idreg_signed_imm_24_out),
 		.dest(idreg_dest_out),
 		.pc(idreg_pc_out),
-		.sr(idreg_sr_out)
+		.sr(idreg_sr_out),
+
+		.src1_out(idreg_src1_out),
+		.src2_out(idreg_src2_out)
 	);
 
 	NegRegister statusReg (
@@ -168,6 +196,12 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.shift_operand(idreg_shift_operand_out),
 		.signed_imm_24(idreg_signed_imm_24_out),
 		.sr(idreg_sr_out),
+
+		// forwarding
+		.src1_sel(fu_src1_sel_out),
+		.src2_sel(fu_src2_sel_out),
+		.wb_value(wb_out),
+		.mem_alu_res(execreg_alu_result_out),
 
 		// outputs
 		.alu_result(exec_alu_result_out),
@@ -198,8 +232,8 @@ module ARMSIM(input CLOCK_50, rst, output[31:0] pc_out);
 		.rst(rst),
 		.mem_read(execreg_mem_r_en_out), 
 		.mem_write(execreg_mem_w_en_out),
-		.address(execreg_st_val_out), 
-		.data(execreg_alu_result_out),
+		.address(execreg_alu_result_out), 
+		.data(execreg_st_val_out),
 		// outputs
 		.mem_result(mem_result_out)
 	);

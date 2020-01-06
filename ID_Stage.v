@@ -1,3 +1,5 @@
+`include "constants.v"
+
 module ID_Stage(
 	input clk, rst,
 	input[31:0] instruction,
@@ -19,7 +21,7 @@ module ID_Stage(
 );
 	wire [3:0] src2;
 	// regFileSrc1Mux
-	assign src2 = (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
+	assign src2 = (instruction[24:21] == `OP_STR && instruction[27:26] == 2'b01) ? instruction[15:12] : (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
 
 	RegisterFile registerFile (
 	  .clk(clk),
