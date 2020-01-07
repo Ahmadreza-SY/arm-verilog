@@ -29,7 +29,7 @@ module ID_Stage(
 	assign src2 = (instruction[24:21] == `OP_STR && instruction[27:26] == 2'b01) ? instruction[15:12] : (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
 	// exam
 	wire [3:0] src1;
-	wire isBL = instruction[24] & w_b;
+	wire isBL = instruction[24] & (instruction[27:26] == 2'b10);
 	assign src1 = ret_sig ? 4'd14 : instruction[19:16];
 
 	RegisterFile registerFile (
