@@ -15,6 +15,9 @@
 `define OP_LDR 4'b0100
 `define OP_STR 4'b0100
 `define OP_B 4'b0111
+// exam
+`define OP_BL 4'b1000
+`define OP_RET 4'b1110
 
 
 // To be used in side ALU // TODO:
@@ -32,3 +35,5 @@
 `define EXE_TST 4'b1000
 `define EXE_LDR 4'b0100
 `define EXE_STR 4'b0100
+// exam
+`define EXE_RET 4'b1110

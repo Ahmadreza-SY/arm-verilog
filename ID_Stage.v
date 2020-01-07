@@ -3,6 +3,8 @@
 module ID_Stage(
 	input clk, rst,
 	input[31:0] instruction,
+	// exam
+	input[31:0] pc,
 	input[31:0] result_wb,
 	input write_back_in,
 	input[3:0] dest_wb,
@@ -15,19 +17,30 @@ module ID_Stage(
 	output imm,
 	output[11:0] shift_operand,
 	output[23:0] signed_imm_24,
-	output[3:0] dest
-	// output[3:0] src1, scr2,
-	// output two_src
+	output[3:0] dest,
+	// exam
+	output ret_sig
 );
+	wire w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en;
+	wire [3:0] w_exe_cmd;
+	wire w_condOut;
 	wire [3:0] src2;
 	// regFileSrc1Mux
 	assign src2 = (instruction[24:21] == `OP_STR && instruction[27:26] == 2'b01) ? instruction[15:12] : (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
+	// exam
+	wire [3:0] src1;
+	wire isBL = instruction[24] & w_b;
+	assign src1 = ret_sig ? 4'd14 : instruction[19:16];
 
 	RegisterFile registerFile (
 	  .clk(clk),
 	  .rst(rst),
 	  .writeBackEn(write_back_in),
-	  .src1(instruction[19:16]),
+	  // exam
+	  .src1(src1),
+	  .bl(isBL),
+	  .pc(pc),
+	  // .src1(instruction[19:16]),
 	  .src2(src2),
 	  .Dest_wb(dest_wb),
 	  .Result_WB(result_wb),
@@ -36,15 +49,12 @@ module ID_Stage(
 	  .reg2(val_rm)
   	);
 
-	wire w_condOut;
   	ConditionCheck condtionCheck (
 	    .cond(instruction[31:28]), 
 	    .nzcv(sr),
 	    .condOut(w_condOut)
   	);
 
-	wire w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en;
-	wire [3:0] w_exe_cmd;
   	ControlUnit controlUnit (
 	    .S(instruction[20]),
 	    .mode(instruction[27:26]),
@@ -54,7 +64,9 @@ module ID_Stage(
 	    .ExecuteCommand(w_exe_cmd),
 	    .mem_write(w_mem_w_en),
 	    .mem_read(w_mem_r_en),
-	    .WB_Enable(w_wb_en)
+	    .WB_Enable(w_wb_en),
+	    // exam
+	    .ret_sig(ret_sig)
   	);
   	
   	assign {s, b, mem_w_en, mem_r_en, wb_en, exe_cmd} = (~w_condOut || hazard) ? 13'd0 : {w_s, w_b, w_mem_w_en, w_mem_r_en, w_wb_en, w_exe_cmd};

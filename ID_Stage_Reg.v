@@ -14,6 +14,9 @@ module ID_Stage_Reg(
 	input[3:0] dest_in,
 	input[3:0] sr_in,
 
+	// exam
+	input ret_sig_in,
+
 	output reg wb_en, mem_r_en, mem_w_en, 
 	output reg b, s,
 	output reg[3:0] exe_cmd,
@@ -25,11 +28,15 @@ module ID_Stage_Reg(
 	output reg[23:0] signed_imm_24,
 	output reg[3:0] dest,
 	output reg[31:0] pc,
-	output reg[3:0] sr
+	output reg[3:0] sr,
+
+	// exam
+	output reg ret_sig_out
 );
 	always @ (posedge clk) begin
 		if (rst) begin
-	  		{wb_en, mem_r_en, mem_w_en, b, s, exe_cmd, val_rn, val_rm, imm, shift_operand, signed_imm_24, pc, sr, src1_out, src2_out} <= 0;
+			// exam
+	  		{wb_en, mem_r_en, mem_w_en, b, s, exe_cmd, val_rn, val_rm, imm, shift_operand, signed_imm_24, pc, sr, src1_out, src2_out, ret_sig_out} <= 0;
 	  		dest <= -1;
 		end
 		else begin
@@ -48,9 +55,10 @@ module ID_Stage_Reg(
 				dest <= 0;
 				pc <= 0;
 				sr <= 0;
-				// TODO:
 				src1_out <= 0;
 				src2_out <= 0;
+				// exam
+				ret_sig_out <= 0;
 			end
 			else begin
 				wb_en <= wb_en_in;
@@ -69,6 +77,8 @@ module ID_Stage_Reg(
 				sr <= sr_in;
 				src1_out <= src1_in;
 				src2_out <= src2_in;
+				// exam
+				ret_sig_out <= ret_sig_in;
 			end
 		end
 	end

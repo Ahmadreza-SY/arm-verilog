@@ -12,11 +12,18 @@ module EXEC_Stage (
 	input[1:0] src1_sel, src2_sel,
 	input[31:0] wb_value, mem_alu_res,
 
+	// exam
+	input ret_sig,
+
 	output[31:0] alu_result, br_addr,
 	output[3:0] status
 );
 	wire [31:0] alu_1_wire, alu_2_wire;
 	wire[31:0] val2;
+	// exam
+	wire[31:0] br_adder_out;
+	assign br_addr = ret_sig ? val_rn : br_adder_out;
+	
 	Val2Generate val2_gen (
 		.val_rm(alu_2_wire),
 		.shift_operand(shift_operand),
@@ -28,7 +35,7 @@ module EXEC_Stage (
 	Adder adder (
 		.in_1(pc_in),
 		.in_2({{8{signed_imm_24[23]}}, signed_imm_24}),
-		.out(br_addr)
+		.out(br_adder_out)
 	);
 
 	ALU alu (

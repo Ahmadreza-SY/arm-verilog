@@ -6,11 +6,14 @@ module ControlUnit (
     input [3:0] opCode,
     output reg B,
     output reg [3:0] ExecuteCommand,
-    output reg S_out, WB_Enable, mem_read, mem_write
+    output reg S_out, WB_Enable, mem_read, mem_write,
+    // exam
+    output reg ret_sig
   );
 
   always @ ( * ) begin
-    {B, ExecuteCommand, S_out, WB_Enable, mem_read, mem_write} <= 0;
+    // exam
+    {B, ExecuteCommand, S_out, WB_Enable, mem_read, mem_write, ret_sig} <= 0;
     case (mode)
       2'b00: begin
         S_out <= S;
@@ -26,6 +29,8 @@ module ControlUnit (
           `OP_EOR: begin ExecuteCommand <= `EXE_EOR; WB_Enable <= 1; end
           `OP_CMP: begin ExecuteCommand <= `EXE_CMP; WB_Enable <= 0; end
           `OP_TST: begin ExecuteCommand <= `EXE_TST; WB_Enable <= 0; end
+          // exam
+          `OP_RET: begin ExecuteCommand <= `EXE_RET; WB_Enable <= 0; ret_sig <= 1; B <= 1; end
       endcase
       end
       2'b01: begin
@@ -41,6 +46,7 @@ module ControlUnit (
       2'b10: begin 
         case (opCode)
           `OP_B: begin ExecuteCommand <= `EXE_NOP; B <= 1; end
+          `OP_BL: begin ExecuteCommand <= `EXE_NOP; B <= 1; end
         endcase
       end
     endcase
