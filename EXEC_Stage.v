@@ -1,3 +1,5 @@
+`include "constants.v"
+
 module EXEC_Stage (
 	input clk,
 	input[31:0] pc_in,
@@ -16,7 +18,7 @@ module EXEC_Stage (
 	output[3:0] status
 );
 	wire [31:0] alu_1_wire, alu_2_wire;
-	wire[31:0] val2;
+	wire[31:0] val2, val2_mul;
 	Val2Generate val2_gen (
 		.val_rm(alu_2_wire),
 		.shift_operand(shift_operand),
@@ -31,9 +33,14 @@ module EXEC_Stage (
 		.out(br_addr)
 	);
 
+	// FIXME should get val_rm without shift if mul (done)
+	assign val2_mul = exe_cmd == `EXE_MUL 
+						? val_rm 
+						: val2;
+
 	ALU alu (
 		.val1(alu_1_wire),
-		.val2(val2),
+		.val2(val2_mul),
 		.C(sr[1]),
 		.exe_cmd(exe_cmd),
 		.alu_out(alu_result),

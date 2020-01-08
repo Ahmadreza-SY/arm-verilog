@@ -10,6 +10,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
 	wire[11:0] id_shift_operand_out;
 	wire[23:0] id_signed_imm_24_out;
 	wire[3:0] id_dest_out;
+	wire[3:0] id_src1, id_src2;
 
 	// IDReg Stage outs
 	wire idreg_wb_en_out, idreg_mem_r_en_out, idreg_mem_w_en_out;
@@ -51,12 +52,15 @@ module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
 
 	// hazard
 	wire hazard_detected;
-	wire [3:0] src2;
-	assign src2 = (ifreg_instruction_out[25] == 1'b0 && ifreg_instruction_out[4] == 0) ? ifreg_instruction_out[3:0] : 4'b0;
+	// wire [3:0] src2, src1;
+	// assign src2 = (ifreg_instruction_out[25] == 1'b0 && ifreg_instruction_out[4] == 0) ? ifreg_instruction_out[3:0] : 4'b0;
+	// assign src1 = (ifreg_instruction_out[4] == 0 && ifreg_instruction_out[27:21] == 7'b0000000 && ifreg_instruction_out[7:4] == 4'b1001) 
+	// 				? ifreg_instruction_out[11:8] /*Rs*/ 
+	// 				: ifreg_instruction_out[19:16];
 
 	HazardDetectionUnit hdu(
-		.src1(ifreg_instruction_out[19:16]),
-		.src2(src2),
+		.src1(id_src1),
+		.src2(id_src2),
 		.Exe_Dest(idreg_dest_out),
 		.Mem_Dest(execreg_dest_out),
 		.Exe_WB_EN(idreg_wb_en_out),
@@ -129,7 +133,9 @@ module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
 		.imm(id_imm_out),
 		.shift_operand(id_shift_operand_out),
 		.signed_imm_24(id_signed_imm_24_out),
-		.dest(id_dest_out)
+		.dest(id_dest_out),
+		.src1(id_src1),
+		.src2(id_src2)
 	);
 
 

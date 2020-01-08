@@ -7,7 +7,7 @@
 `define OP_ADC 4'b0101
 `define OP_SUB 4'b0010
 `define OP_SBC 4'b0110
-`define OP_AND 4'b0000
+`define OP_AND_MUL 4'b0000
 `define OP_ORR 4'b1100
 `define OP_EOR 4'b0001
 `define OP_CMP 4'b1010
@@ -26,6 +26,7 @@
 `define EXE_SUB 4'b0010
 `define EXE_SBC 4'b0110
 `define EXE_AND 4'b0000
+`define EXE_MUL 4'b1011
 `define EXE_ORR 4'b1100
 `define EXE_EOR 4'b0001
 `define EXE_CMP 4'b1010

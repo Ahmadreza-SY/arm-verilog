@@ -4,6 +4,9 @@ module ControlUnit (
     input S,
     input [1:0] mode,
     input [3:0] opCode,
+    // FIXME: add input of [7-4] to decide for mul (done)
+    input [3:0] mul_bits,
+
     output reg B,
     output reg [3:0] ExecuteCommand,
     output reg S_out, WB_Enable, mem_read, mem_write
@@ -21,7 +24,10 @@ module ControlUnit (
           `OP_ADC: begin ExecuteCommand <= `EXE_ADC; WB_Enable <= 1; end
           `OP_SUB: begin ExecuteCommand <= `EXE_SUB; WB_Enable <= 1; end
           `OP_SBC: begin ExecuteCommand <= `EXE_SBC; WB_Enable <= 1; end
-          `OP_AND: begin ExecuteCommand <= `EXE_AND; WB_Enable <= 1; end
+          `OP_AND_MUL: begin 
+            // FIXME: decide for mul (done)
+            ExecuteCommand <= (mul_bits == 4'b1001) ? `EXE_MUL : `EXE_AND; WB_Enable <= 1; 
+          end
           `OP_ORR: begin ExecuteCommand <= `EXE_ORR; WB_Enable <= 1; end
           `OP_EOR: begin ExecuteCommand <= `EXE_EOR; WB_Enable <= 1; end
           `OP_CMP: begin ExecuteCommand <= `EXE_CMP; WB_Enable <= 0; end

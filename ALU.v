@@ -31,6 +31,7 @@ module ALU (
         {nzcv[1], alu_out} = val1 - val2 + C - 1;  
         nzcv[0] = (val1[N-1]^val2[N-1]) & (val1[N-1]^alu_out[N-1]);
       end 
+      `EXE_MUL: alu_out = val1 * val2; // FIXME should work fine! (done)
       `EXE_AND: alu_out = val1 & val2;
       `EXE_ORR: alu_out = val1 | val2;
       `EXE_EOR: alu_out = val1 ^ val2;
