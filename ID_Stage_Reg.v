@@ -30,7 +30,7 @@ module ID_Stage_Reg(
 	always @ (posedge clk) begin
 		if (rst) begin
 	  		{wb_en, mem_r_en, mem_w_en, b, s, exe_cmd, val_rn, val_rm, imm, shift_operand, signed_imm_24, pc, sr, src1_out, src2_out} <= 0;
-	  		dest <= -1;
+	  		dest <= 4'b1111;
 		end
 		else begin
 			if (flush) begin

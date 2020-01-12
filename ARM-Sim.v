@@ -1,4 +1,5 @@
-module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
+module ARMSIM(input CLOCK_50, rst, fu_EN);
+
 	wire[31:0] if_pc_out, if_instruction_out;
 	wire[31:0] ifreg_instruction_out;
 	wire[31:0] ifreg_pc_out;
@@ -261,5 +262,4 @@ module ARMSIM(input CLOCK_50, rst, fu_EN, output[31:0] pc_out);
 		// outs
 		.out(wb_out)
 	);
-
 endmodule
