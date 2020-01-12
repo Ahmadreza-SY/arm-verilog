@@ -12,8 +12,7 @@ module ForwardingUnit(
   always @(*) begin
   		if (~fu_EN) begin
   			src1_sel <= 2'b00;
-  		end
-		else if ((WB_EN_WB == 1'b1) &&
+  		end else if ((WB_EN_WB == 1'b1) &&
 			/*	(!((WB_EN_MEM == 1'b1) && (MEM_Rd_in !== 31) && (MEM_Rd_in !== EX_Rn_in))) && */
 				(WB_Rd_in === EX_Rn_in)) begin
 			src1_sel <= 2'b01;
@@ -25,8 +24,7 @@ module ForwardingUnit(
 
 		if (~fu_EN) begin
   			src2_sel <= 2'b00;
-  		end
-		else if ((WB_EN_WB == 1'b1) &&
+  		end else if ((WB_EN_WB == 1'b1) &&
 			/*	(!((WB_EN_MEM == 1'b1) && (MEM_Rd_in !== 31) && (MEM_Rd_in !== EX_Rm_in))) && */
 				(WB_Rd_in === EX_Rm_in)) begin
 			src2_sel <= 2'b01;

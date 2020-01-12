@@ -15,13 +15,15 @@ module ID_Stage(
 	output imm,
 	output[11:0] shift_operand,
 	output[23:0] signed_imm_24,
-	output[3:0] dest
-	// output[3:0] src1, scr2,
+	output[3:0] dest, src2
 	// output two_src
 );
-	wire [3:0] src2;
 	// regFileSrc1Mux
-	assign src2 = (instruction[24:21] == `OP_STR && instruction[27:26] == 2'b01) ? instruction[15:12] : (imm == 1'b0 && instruction[4] == 0) ? instruction[3:0] : 4'b0;
+	assign src2 = (instruction[24:21] == `OP_STR && instruction[27:26] == 2'b01) 
+		? instruction[15:12] 
+		: (imm == 1'b0 && instruction[4] == 0) 
+			? instruction[3:0] 
+			: 4'b0;
 
 	RegisterFile registerFile (
 	  .clk(clk),

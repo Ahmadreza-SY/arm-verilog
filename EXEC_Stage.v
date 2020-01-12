@@ -12,13 +12,13 @@ module EXEC_Stage (
 	input[1:0] src1_sel, src2_sel,
 	input[31:0] wb_value, mem_alu_res,
 
-	output[31:0] alu_result, br_addr,
+	output[31:0] alu_result, br_addr, val_rm_out,
 	output[3:0] status
 );
-	wire [31:0] alu_1_wire, alu_2_wire;
+	wire [31:0] alu_1_wire;
 	wire[31:0] val2;
 	Val2Generate val2_gen (
-		.val_rm(alu_2_wire),
+		.val_rm(val_rm_out),
 		.shift_operand(shift_operand),
 		.los(mem_r_en | mem_w_en),
 		.imm(imm),
@@ -53,7 +53,7 @@ module EXEC_Stage (
 		.reg_wb_in(wb_value), 
 		.reg_mem_in(mem_alu_res), 
 		.forward_control_in(src2_sel), 
-		.reg_out(alu_2_wire)
+		.reg_out(val_rm_out)
 	);
 
 endmodule

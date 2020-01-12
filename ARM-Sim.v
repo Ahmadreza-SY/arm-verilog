@@ -10,7 +10,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 	wire id_imm_out;
 	wire[11:0] id_shift_operand_out;
 	wire[23:0] id_signed_imm_24_out;
-	wire[3:0] id_dest_out;
+	wire[3:0] id_dest_out, id_src2_out;
 
 	// IDReg Stage outs
 	wire idreg_wb_en_out, idreg_mem_r_en_out, idreg_mem_w_en_out;
@@ -26,7 +26,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
   	wire[3:0] idreg_src1_out, idreg_src2_out;
 
   	// EXEC Stage outs
-  	wire[31:0] exec_alu_result_out, exec_br_addr_out;
+  	wire[31:0] exec_alu_result_out, exec_br_addr_out, exec_val_rm_out;
  	wire[3:0] exec_status_out;
 
  	// EXECReg Stage outs
@@ -52,12 +52,11 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 
 	// hazard
 	wire hazard_detected;
-	wire [3:0] src2;
-	assign src2 = (ifreg_instruction_out[25] == 1'b0 && ifreg_instruction_out[4] == 0) ? ifreg_instruction_out[3:0] : 4'b0;
+	
 
 	HazardDetectionUnit hdu(
 		.src1(ifreg_instruction_out[19:16]),
-		.src2(src2),
+		.src2(id_src2_out),
 		.Exe_Dest(idreg_dest_out),
 		.Mem_Dest(execreg_dest_out),
 		.Exe_WB_EN(idreg_wb_en_out),
@@ -66,7 +65,6 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 
 		.MEM_R_EN_EXE(idreg_mem_r_en_out),
 		.fu_EN(fu_EN), 
-		.instr_is_branch(idreg_b_out),
 
 		.is_str(id_mem_w_en_out),
  		.hazard_detected(hazard_detected)
@@ -130,7 +128,8 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 		.imm(id_imm_out),
 		.shift_operand(id_shift_operand_out),
 		.signed_imm_24(id_signed_imm_24_out),
-		.dest(id_dest_out)
+		.dest(id_dest_out),
+		.src2(id_src2_out)
 	);
 
 
@@ -154,7 +153,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 		.sr_in(status_reg_out[31:28]),
 
 		.src1_in(ifreg_instruction_out[19:16]),
-		.src2_in(src2),
+		.src2_in(id_src2_out),
 		
 		// outputs
 		.wb_en(idreg_wb_en_out), 
@@ -206,6 +205,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 
 		// outputs
 		.alu_result(exec_alu_result_out),
+		.val_rm_out(exec_val_rm_out),
 		.br_addr(exec_br_addr_out),
 		.status(exec_status_out)
 	);
@@ -217,7 +217,7 @@ module ARMSIM(input CLOCK_50, rst, fu_EN);
 		.mem_r_en_in(idreg_mem_r_en_out),
 		.mem_w_en_in(idreg_mem_w_en_out),
 		.alu_result_in(exec_alu_result_out),
-		.st_val_in(idreg_val_rm_out),
+		.st_val_in(exec_val_rm_out),
 		.dest_in(idreg_dest_out),
 		// outs
 		.wb_en(execreg_wb_en_out),

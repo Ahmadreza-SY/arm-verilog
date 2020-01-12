@@ -1,13 +1,11 @@
-module TB ();
+module aa_tb ();
  
   reg clk, rst, fu_EN;
-  wire[31:0] pc_out;
  
   ARMSIM armsim (
 		.CLOCK_50(clk),
 		.rst(rst),
-    .fu_EN(fu_EN),
-		.pc_out(pc_out)
+    .fu_EN(fu_EN)
 	);
  
   initial begin
